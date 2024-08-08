@@ -14,6 +14,11 @@ const PLAID_PROD = (process.env.PLAID_PRODUCTS || Products.Transactions).split(
 const PLAID_COUNTRY_CODES = (process.env.PLAID_COUNTRY_CODES || "US").split(
   ","
 );
+
+let ACCESS_TOKEN = null;
+let ITEM_ID = null;
+let PUBLIC_TOKEN = null;
+
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 
@@ -50,6 +55,22 @@ app.post("/api/create_link_token", async (request, response, next) => {
     next;
   }
 });
+
+app.post("/api/set_access_token", async (request, response) => {
+  PUBLIC_TOKEN = request.body.public_token;
+  try {
+    const tokenExchange = await client.itemPublicTokenExchange({
+      public_token: PUBLIC_TOKEN,
+    });
+
+    ACCESS_TOKEN = tokenExchange.data.access_token;
+    ITEM_ID = tokenExchange.data.item_id;
+    response.json(true);
+  } catch (error) {
+    console.log(`Error exchanging tokens: ${error}`);
+  }
+});
+
 app.listen(PORT, () => {
   console.log(`Listening on Port ${PORT}`);
 });
