@@ -1,10 +1,20 @@
 const express = require("express");
-const { Configuration, PlaidApi, PlaidEnvironments } = require("plaid");
+const {
+  Configuration,
+  PlaidApi,
+  PlaidEnvironments,
+  Products,
+} = require("plaid");
 const app = express();
 const PORT = 3000;
 const PLAID_ENV = process.env.PLAID_ENV || "sandbox";
-const PLAID_PROD = process.env.PLAID_PRODUCTS;
-const PLAID_COUNTRY_CODES = process.env.PLAID_COUNTRY_CODES;
+const PLAID_PROD = (process.env.PLAID_PRODUCTS || Products.Transactions).split(
+  ","
+);
+const PLAID_COUNTRY_CODES = (process.env.PLAID_COUNTRY_CODES || "US").split(
+  ","
+);
+app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 
 const config = new Configuration({
@@ -29,10 +39,11 @@ app.post("/api/create_link_token", async (request, response, next) => {
     client_name: "Bank App",
     products: PLAID_PROD,
     language: "en",
-    country_codes: "PLAID_COUNTRY_CODES",
+    country_codes: PLAID_COUNTRY_CODES,
   };
   try {
     const createTokenResponse = await client.linkTokenCreate(configToken);
+    console.log(createTokenResponse);
     response.json(createTokenResponse.data);
   } catch (error) {
     console.log(`Error getting link token: ${error}`);
