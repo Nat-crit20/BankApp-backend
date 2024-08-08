@@ -84,6 +84,18 @@ app.get("api/balance", async (request, response, next) => {
   }
 });
 
+app.get("/api/accounts", async (request, response, next) => {
+  try {
+    const accountResponse = await client.accountsGet({
+      access_token: ACCESS_TOKEN,
+    });
+    response.json(accountResponse.data);
+  } catch (error) {
+    console.log(`Error getting the accounts: ${error}`);
+    next;
+  }
+});
+
 app.listen(PORT, () => {
   console.log(`Listening on Port ${PORT}`);
 });
