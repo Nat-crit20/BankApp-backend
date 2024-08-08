@@ -56,7 +56,7 @@ app.post("/api/create_link_token", async (request, response, next) => {
   }
 });
 
-app.post("/api/set_access_token", async (request, response) => {
+app.post("/api/set_access_token", async (request, response, next) => {
   PUBLIC_TOKEN = request.body.public_token;
   try {
     const tokenExchange = await client.itemPublicTokenExchange({
@@ -68,6 +68,19 @@ app.post("/api/set_access_token", async (request, response) => {
     response.json(true);
   } catch (error) {
     console.log(`Error exchanging tokens: ${error}`);
+    next;
+  }
+});
+
+app.get("api/balance", async (request, response, next) => {
+  try {
+    const balanceResponse = await client.accountsBalanceGet({
+      access_token: ACCESS_TOKEN,
+    });
+    response.json(balanceResponse.data);
+  } catch (error) {
+    console.log(`Error getting account balance: ${error}`);
+    next;
   }
 });
 
