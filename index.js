@@ -1,11 +1,14 @@
 const express = require("express");
+const cors = require("cors");
 const {
   Configuration,
   PlaidApi,
   PlaidEnvironments,
   Products,
 } = require("plaid");
+
 const app = express();
+app.use(cors());
 const PORT = 3000;
 const PLAID_ENV = process.env.PLAID_ENV || "sandbox";
 const PLAID_PROD = (process.env.PLAID_PRODUCTS || Products.Transactions).split(
