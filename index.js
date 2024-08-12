@@ -52,7 +52,6 @@ app.post("/api/create_link_token", async (request, response, next) => {
     country_codes: PLAID_COUNTRY_CODES,
     language: "en",
   };
-  console.log(configToken);
   try {
     const createTokenResponse = await client.linkTokenCreate(configToken);
     response.json(createTokenResponse.data);
@@ -71,7 +70,7 @@ app.post("/api/set_access_token", async (request, response, next) => {
 
     ACCESS_TOKEN = tokenExchange.data.access_token;
     ITEM_ID = tokenExchange.data.item_id;
-    response.json(true);
+    response.json(ITEM_ID);
   } catch (error) {
     console.log(`Error exchanging tokens: ${error}`);
     next;
