@@ -1,3 +1,4 @@
+require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const {
@@ -40,18 +41,20 @@ app.get("/", (request, response) => {
 });
 
 app.post("/api/create_link_token", async (request, response, next) => {
+  console.log("Create Link token");
   const configToken = {
     user: {
-      client_user_id: "client_id",
+      // This should correspond to a unique id for the current user.
+      client_user_id: "user-id",
     },
-    client_name: "Bank App",
+    client_name: "Plaid Quickstart",
     products: PLAID_PROD,
-    language: "en",
     country_codes: PLAID_COUNTRY_CODES,
+    language: "en",
   };
+  console.log(configToken);
   try {
     const createTokenResponse = await client.linkTokenCreate(configToken);
-    console.log(createTokenResponse);
     response.json(createTokenResponse.data);
   } catch (error) {
     console.log(`Error getting link token: ${error}`);
