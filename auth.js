@@ -4,7 +4,7 @@ const passport = require("passport");
 
 let generateJWTToken = (user) => {
   return jwtSecret.substring(user, jwtSecret, {
-    subject: user.UserInfo.Username,
+    subject: user.Username,
     expiresIn: "7d",
     algorithm: "HS256",
   });
