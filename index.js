@@ -1,5 +1,8 @@
 require("dotenv").config();
+const Users = require("./Models/UserSchema.js");
+const User = Users.User;
 const express = require("express");
+const mongoose = require("mongoose");
 const cors = require("cors");
 const {
   Configuration,
@@ -9,6 +12,15 @@ const {
 } = require("plaid");
 
 const app = express();
+async function main() {
+  await mongoose.connect(process.env.CONNECTION_URL, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  });
+}
+main()
+  .then(() => console.log("Connected to database"))
+  .catch((err) => console.log(`Database Error: ${err}`));
 app.use(cors());
 const PORT = 3000;
 const PLAID_ENV = process.env.PLAID_ENV || "sandbox";
@@ -36,6 +48,11 @@ const config = new Configuration({
   },
 });
 const client = new PlaidApi(config);
+
+let auth = require("./auth")(app);
+const passport = require("passport");
+require("./passport");
+
 app.get("/", (request, response) => {
   response.json("Hello World");
 });
