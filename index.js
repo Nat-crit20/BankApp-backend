@@ -118,6 +118,37 @@ app.get("/api/accounts", async (request, response, next) => {
   }
 });
 
+app.get("/api/transactions", async (request, response) => {
+  let cursor = null;
+  let added = [];
+  let modified = [];
+  let removed = [];
+  let hasMore = true;
+
+  while (hasMore) {
+    const request = {
+      access_token: ACCESS_TOKEN,
+      cursor: cursor,
+    };
+    const response = await client.transactionsSync(request);
+    const data = response.data;
+    cursor = data.next_cursor;
+    if (cursor === "") {
+      await sleep(2000);
+    }
+
+    added = added.concat(data.added);
+    modified = modified.concat(data.modified);
+    removed = removed.concat(data.removed);
+    hasMore = data.has_more;
+  }
+  const compareTxnsByDateAscending = (a, b) =>
+    (a.date > b.date) - (a.date < b.date);
+  // Return the 8 most recent transactions
+  const recently_added = [...added].sort(compareTxnsByDateAscending).slice(-8);
+  response.json({ latest_transactions: recently_added });
+});
+
 app.listen(PORT, () => {
   console.log(`Listening on Port ${PORT}`);
 });
