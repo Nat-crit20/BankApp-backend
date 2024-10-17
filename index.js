@@ -1,6 +1,9 @@
 require("dotenv").config();
 const Users = require("./Models/UserSchema.js");
+const Goals = require("./Models/GoalSchema.js");
 const User = Users.User;
+const Goal = Goals.Goal;
+
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
