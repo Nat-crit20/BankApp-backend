@@ -26,6 +26,7 @@ let userSchema = mongoose.Schema({
     type: String,
     required: false,
   },
+  Goals: [{ type: mongoose.Schema.Types.ObjectId, ref: "Goal" }],
 });
 
 userSchema.statics.hashPassword = (password) => {
