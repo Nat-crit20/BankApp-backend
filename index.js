@@ -61,7 +61,6 @@ app.get("/", (request, response) => {
 });
 
 app.post("/api/create_link_token", async (request, response, next) => {
-  console.log("Create Link token");
   const configToken = {
     user: {
       // This should correspond to a unique id for the current user.
@@ -96,6 +95,10 @@ app.post("/api/set_access_token", async (request, response, next) => {
     next;
   }
 });
+app.get("/goal", async (request, response) => {});
+app.post("/goal", async (request, response) => {});
+app.put("/goal", async (request, response) => {});
+app.delete("/goal", async (request, response) => {});
 
 app.get("api/balance", async (request, response, next) => {
   try {
