@@ -159,6 +159,19 @@ app.put("/goal/:goalID", async (request, response) => {
 });
 app.delete("/user/:userID/goal/:goalID", async (request, response) => {
   const { userID, goalID } = request.params;
+
+  await User.findOneAndUpdate(
+    { _id: userID },
+    { $pull: { _id: goalID } },
+    { new: tru }
+  )
+    .then(async (user) => {
+      await Goal.findByIdAndDelete({ _id: goalID });
+      return response.status(200).json(user);
+    })
+    .catch((error) => {
+      return response.status(400).json(error);
+    });
 });
 
 app.get("api/balance", async (request, response, next) => {
