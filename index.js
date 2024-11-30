@@ -97,13 +97,13 @@ app.post("/api/set_access_token", async (request, response, next) => {
 });
 app.get("/user/:userID", async (request, response) => {
   let { userID } = request.params;
-  const user = await User.findById(
-    { id: userID },
+  await User.findById(
+    { _id: userID },
     { First: 1, Last: 1, Email: 1, Goals: 1 }
   )
     .populate("Goals")
-    .then((user) => res.send(user))
-    .catch((err) => res.send(err));
+    .then((user) => response.status(200).json(user))
+    .catch((err) => response.status(400).json(err));
 });
 app.post("/user", async (request, response) => {
   let { Username, First, Last, Password, Email } = request.body;
@@ -132,8 +132,18 @@ app.post("/user", async (request, response) => {
       return response.status(400).json(error);
     });
 });
-app.post("/user/:userID/goal/:goalID", async (request, response) => {
-  const { userID, goalID } = request.params;
+app.post("/user/:userID/goal", async (request, response) => {
+  const { userID } = request.params;
+  const { Category, Budget, Amount } = request.body;
+
+  const goal = Goal.create({ Category, Budget, Amount });
+  await User.findOneAndUpdate(
+    { _id: userID },
+    { $push: { Goals: goal._id } },
+    { new: true }
+  )
+    .then((user) => response.status(200).json(user))
+    .catch((err) => response.status(400).json(err));
 });
 app.put("/user/:userID/goal/:goalID", async (request, response) => {
   const { userID, goalID } = request.params;
