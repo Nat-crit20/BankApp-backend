@@ -100,6 +100,33 @@ app.get("/user/#userID", async (request, response) => {
   const user = await User.findById(userID, "First Last Email Goals").exec();
   return user.json();
 });
+app.post("/user", async (request, response) => {
+  let { Username, First, Last, Password, Email } = request.body;
+  const hashedPassword = User.hashPassword(Password);
+  await User.findOne({ Email: Email })
+    .then((user) => {
+      if (user) {
+        return response.status(400).json("User already exists");
+      } else {
+        User.create({
+          Username,
+          First,
+          Last,
+          Password: hashedPassword,
+          Email,
+        })
+          .then((user) => {
+            return response.status(200).json("User created");
+          })
+          .catch((error) => {
+            return response.status(400).json(error);
+          });
+      }
+    })
+    .catch((error) => {
+      return response.status(400).json(error);
+    });
+});
 app.post("/user/#user/goal/#goalID", async (request, response) => {});
 app.put("/user/#user/goal/#goalID", async (request, response) => {});
 app.delete("/user/#user/goal/#goalID", async (request, response) => {});
