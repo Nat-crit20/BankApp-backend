@@ -97,8 +97,13 @@ app.post("/api/set_access_token", async (request, response, next) => {
 });
 app.get("/user/:userID", async (request, response) => {
   let { userID } = request.params;
-  const user = await User.findById(userID, "First Last Email Goals").exec();
-  return user.json();
+  const user = await User.findById(
+    { id: userID },
+    { First: 1, Last: 1, Email: 1, Goals: 1 }
+  )
+    .populate("Goals")
+    .then((user) => res.send(user))
+    .catch((err) => res.send(err));
 });
 app.post("/user", async (request, response) => {
   let { Username, First, Last, Password, Email } = request.body;
@@ -127,9 +132,15 @@ app.post("/user", async (request, response) => {
       return response.status(400).json(error);
     });
 });
-app.post("/user/:user/goal/:goalID", async (request, response) => {});
-app.put("/user/:user/goal/:goalID", async (request, response) => {});
-app.delete("/user/#user/goal/#goalID", async (request, response) => {});
+app.post("/user/:userID/goal/:goalID", async (request, response) => {
+  const { userID, goalID } = request.params;
+});
+app.put("/user/:userID/goal/:goalID", async (request, response) => {
+  const { userID, goalID } = request.params;
+});
+app.delete("/user/:userID/goal/:goalID", async (request, response) => {
+  const { userID, goalID } = request.params;
+});
 
 app.get("api/balance", async (request, response, next) => {
   try {
