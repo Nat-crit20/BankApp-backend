@@ -145,8 +145,17 @@ app.post("/user/:userID/goal", async (request, response) => {
     .then((user) => response.status(200).json(user))
     .catch((err) => response.status(400).json(err));
 });
-app.put("/user/:userID/goal/:goalID", async (request, response) => {
-  const { userID, goalID } = request.params;
+app.put("/goal/:goalID", async (request, response) => {
+  const { goalID } = request.params;
+  const { Category, Budget, Amount } = request.body;
+
+  await Goal.findOneAndUpdate(
+    { _id: goalID },
+    { $set: { Category, Budget, Amount } },
+    { new: true }
+  )
+    .then((goal) => response.status(200).json(goal))
+    .catch((err) => response.status(400).json(err));
 });
 app.delete("/user/:userID/goal/:goalID", async (request, response) => {
   const { userID, goalID } = request.params;
