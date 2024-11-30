@@ -95,7 +95,7 @@ app.post("/api/set_access_token", async (request, response, next) => {
     next;
   }
 });
-app.get("/user/#userID", async (request, response) => {
+app.get("/user/:userID", async (request, response) => {
   let { userID } = request.params;
   const user = await User.findById(userID, "First Last Email Goals").exec();
   return user.json();
@@ -127,8 +127,8 @@ app.post("/user", async (request, response) => {
       return response.status(400).json(error);
     });
 });
-app.post("/user/#user/goal/#goalID", async (request, response) => {});
-app.put("/user/#user/goal/#goalID", async (request, response) => {});
+app.post("/user/:user/goal/:goalID", async (request, response) => {});
+app.put("/user/:user/goal/:goalID", async (request, response) => {});
 app.delete("/user/#user/goal/#goalID", async (request, response) => {});
 
 app.get("api/balance", async (request, response, next) => {
