@@ -96,8 +96,28 @@ app.post("/api/set_access_token", async (request, response, next) => {
       (account) => account.owners
     );
     identity = identities;
-
-    response.json({ identity: identities });
+    await User.findOne({ Names: identities[0].names[0] })
+      .then((user) => {
+        if (user) {
+          return response.json({ message: "user found", user });
+        } else {
+          User.create({
+            Name: identities[0].names,
+            Email: identities[0].emails,
+          })
+            .then((user) => {
+              return response
+                .status(200)
+                .json({ message: "user created", user });
+            })
+            .catch((error) => {
+              return response.status(400).json(error);
+            });
+        }
+      })
+      .catch((error) => {
+        return response.status(400).json(error);
+      });
   } catch (error) {
     console.log(`Error exchanging tokens: ${error}`);
     next;
