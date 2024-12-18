@@ -37,7 +37,7 @@ const PLAID_COUNTRY_CODES = (process.env.PLAID_COUNTRY_CODES || "US").split(
 let ACCESS_TOKEN = null;
 let ITEM_ID = null;
 let PUBLIC_TOKEN = null;
-
+let identity = null;
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 
@@ -89,33 +89,21 @@ app.post("/api/set_access_token", async (request, response, next) => {
 
     ACCESS_TOKEN = tokenExchange.data.access_token;
     ITEM_ID = tokenExchange.data.item_id;
-    response.json(ITEM_ID);
-  } catch (error) {
-    console.log(`Error exchanging tokens: ${error}`);
-    next;
-  }
-});
-
-app.get("/api/identity", async (request, response) => {
-  try {
     const identity = await client.identityGet({
       access_token: ACCESS_TOKEN,
     });
     const identities = identity.data.accounts.flatMap(
       (account) => account.owners
     );
-    response.json({ identity: identities, item: ITEM_ID });
+    response.json({ identity: identities });
   } catch (error) {
-    console.log(`Error getting user identity: ${error}`);
+    console.log(`Error exchanging tokens: ${error}`);
+    next;
   }
 });
 
-app.get("/user/:userID", async (request, response) => {
-  let { userID } = request.params;
-  await User.findById(
-    { _id: userID },
-    { First: 1, Last: 1, Email: 1, Goals: 1 }
-  )
+app.get("/user", async (request, response) => {
+  await User.find({ _id: userID }, { First: 1, Last: 1, Email: 1, Goals: 1 })
     .populate("Goals")
     .then((user) => response.status(200).json(user))
     .catch((err) => response.status(400).json(err));
