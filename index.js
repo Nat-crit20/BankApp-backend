@@ -95,6 +95,21 @@ app.post("/api/set_access_token", async (request, response, next) => {
     next;
   }
 });
+
+app.get("/api/identity", async (request, response) => {
+  try {
+    const identity = await client.identityGet({
+      access_token: ACCESS_TOKEN,
+    });
+    const identities = identity.data.accounts.flatMap(
+      (account) => account.owners
+    );
+    response.json({ identity: identities, item: ITEM_ID });
+  } catch (error) {
+    console.log(`Error getting user identity: ${error}`);
+  }
+});
+
 app.get("/user/:userID", async (request, response) => {
   let { userID } = request.params;
   await User.findById(
@@ -105,6 +120,7 @@ app.get("/user/:userID", async (request, response) => {
     .then((user) => response.status(200).json(user))
     .catch((err) => response.status(400).json(err));
 });
+
 app.post("/user", async (request, response) => {
   let { Username, First, Last, Password, Email } = request.body;
   const hashedPassword = User.hashPassword(Password);
@@ -136,7 +152,8 @@ app.post("/user/:userID/goal", async (request, response) => {
   const { userID } = request.params;
   const { Category, Budget, Amount } = request.body;
 
-  const goal = Goal.create({ Category, Budget, Amount });
+  const goal = await Goal.create({ Category, Budget, Amount });
+
   await User.findOneAndUpdate(
     { _id: userID },
     { $push: { Goals: goal._id } },
@@ -162,11 +179,11 @@ app.delete("/user/:userID/goal/:goalID", async (request, response) => {
 
   await User.findOneAndUpdate(
     { _id: userID },
-    { $pull: { _id: goalID } },
-    { new: tru }
+    { $pull: { Goals: goalID } },
+    { new: true }
   )
     .then(async (user) => {
-      await Goal.findByIdAndDelete({ _id: goalID });
+      await Goal.findByIdAndDelete(goalID);
       return response.status(200).json(user);
     })
     .catch((error) => {
