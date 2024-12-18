@@ -95,6 +95,8 @@ app.post("/api/set_access_token", async (request, response, next) => {
     const identities = identity.data.accounts.flatMap(
       (account) => account.owners
     );
+    identity = identities;
+
     response.json({ identity: identities });
   } catch (error) {
     console.log(`Error exchanging tokens: ${error}`);
