@@ -125,39 +125,12 @@ app.post("/api/set_access_token", async (request, response, next) => {
 });
 
 app.get("/user", async (request, response) => {
-  await User.find({ _id: userID }, { First: 1, Last: 1, Email: 1, Goals: 1 })
+  await User.find({ Name: identity[0].names }, { Name: 1, Email: 1, Goals: 1 })
     .populate("Goals")
     .then((user) => response.status(200).json(user))
     .catch((err) => response.status(400).json(err));
 });
 
-app.post("/user", async (request, response) => {
-  let { Username, First, Last, Password, Email } = request.body;
-  const hashedPassword = User.hashPassword(Password);
-  await User.findOne({ Email: Email })
-    .then((user) => {
-      if (user) {
-        return response.status(400).json("User already exists");
-      } else {
-        User.create({
-          Username,
-          First,
-          Last,
-          Password: hashedPassword,
-          Email,
-        })
-          .then((user) => {
-            return response.status(200).json("User created");
-          })
-          .catch((error) => {
-            return response.status(400).json(error);
-          });
-      }
-    })
-    .catch((error) => {
-      return response.status(400).json(error);
-    });
-});
 app.post("/user/:userID/goal", async (request, response) => {
   const { userID } = request.params;
   const { Category, Budget, Amount } = request.body;
